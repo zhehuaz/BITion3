@@ -20,9 +20,6 @@ public class WifiChangedReceiver extends BroadcastReceiver {
         } else if (intent.getAction().equals("android.net.wifi.WIFI_STATE_CHANGED")) {
             Log.i(TAG, intent.getAction() + " received: " + intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN));
         } else if (intent.getAction().equals("android.net.wifi.STATE_CHANGED")) {
-//            int type = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
-//            intent.getIntExtra();
-//            NetworkInfo info = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).get;
             Log.i(TAG, intent.getAction() + " received.");
         } else if(intent.getAction().equals("android.net.conn.CONNECTIVITY_CHANGE")) {
             Log.i(TAG, intent.getAction() + " received.");
