@@ -11,9 +11,6 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import me.zhehua.bition3.events.WifiStateChangeEvent;
 
-/**
- * Created by Administrator on 2016/2/28.
- */
 public class LoginService extends Service {
     public final static String TAG = "LoginService";
     @Nullable
@@ -47,8 +44,5 @@ public class LoginService extends Service {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onWifiStateChangedEvent(WifiStateChangeEvent event){
-
     }
-
-
 }
