@@ -1,4 +1,4 @@
-package me.zhehua.bition3.service;
+package me.zhehua.bition3.connection;
 
 import android.app.Service;
 import android.content.Intent;

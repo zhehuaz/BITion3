@@ -5,10 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
-
-import me.zhehua.bition3.events.BootCompleteEvent;
-import me.zhehua.bition3.service.LoginService;
+import me.zhehua.bition3.connection.LoginService;
 
 public class BootCompletedReceiver extends BroadcastReceiver {
     public final static String TAG = "BootCompletedReceiver";

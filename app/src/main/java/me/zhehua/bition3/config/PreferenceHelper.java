@@ -33,8 +33,12 @@ public class PreferenceHelper {
                 .apply();
     }
 
-    public static void getUsername(@NonNull SharedPreferences sp) {
-        sp.getString(KEY_USER_NAME, "");
+    public static String getUsername(@NonNull SharedPreferences sp) {
+        return sp.getString(KEY_USER_NAME, "");
+    }
+
+    public static String getPassword(@NonNull SharedPreferences sp) {
+        return sp.getString(KEY_USER_PWD, "");
     }
 
     public static void saveIsAutoLogin(@NonNull SharedPreferences sp, boolean isAutoLogin) {
