@@ -3,27 +3,25 @@ package me.zhehua.bition3.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 
-import me.zhehua.bition3.BuildConfig;
+import me.zhehua.bition3.config.PreferenceHelper;
 import me.zhehua.bition3.events.WifiStateChangeEvent;
-import me.zhehua.bition3.ui.MainActivity;
 
-/**
- * Created by Administrator on 2016/2/28.
- */
 public class WifiChangedReceiver extends BroadcastReceiver {
     public final static String TAG = "WifiChangedReceiver";
 
+    SharedPreferences sharedPreferences;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        sharedPreferences = context.getSharedPreferences(PreferenceHelper.PREFERENCE_NAME, Context.MODE_PRIVATE);
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = manager.getActiveNetworkInfo();
@@ -34,6 +32,17 @@ public class WifiChangedReceiver extends BroadcastReceiver {
             NetworkInfo.State state = networkInfo.getState();
             Log.i(TAG, "state is " + state.toString());
             EventBus.getDefault().post(new WifiStateChangeEvent());
+
+            if (PreferenceHelper.isAutoLogin(sharedPreferences)) {
+                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                String currentSsid = wifiManager.getConnectionInfo().getSSID();
+                if (PreferenceHelper.isAutoSsid(sharedPreferences, currentSsid)) {
+                    Intent checkIntent = new Intent(ConnectionCheckReceiver.CONNECTION_CHECK_ACTION);
+                    context.sendBroadcast(checkIntent);
+                }
+            } else {
+
+            }
         }
     }
 }
