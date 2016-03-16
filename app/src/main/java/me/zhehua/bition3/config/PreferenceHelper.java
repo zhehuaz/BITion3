@@ -101,7 +101,8 @@ public class PreferenceHelper {
             if (autoSsids.contains(trimSsid(ssid)))
                 return true;
         }
-        return false;
+        //return false;
+        return true;
     }
 
     public static String trimSsid(String ssid) {

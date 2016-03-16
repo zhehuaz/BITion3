@@ -12,6 +12,7 @@ import android.util.Log;
 import org.greenrobot.eventbus.EventBus;
 
 import me.zhehua.bition3.config.PreferenceHelper;
+import me.zhehua.bition3.connection.ConnCheckAlarmManger;
 import me.zhehua.bition3.events.WifiStateChangeEvent;
 
 public class WifiChangedReceiver extends BroadcastReceiver {
@@ -37,7 +38,7 @@ public class WifiChangedReceiver extends BroadcastReceiver {
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 String currentSsid = wifiManager.getConnectionInfo().getSSID();
                 if (PreferenceHelper.isAutoSsid(sharedPreferences, currentSsid)) {
-                    Intent checkIntent = new Intent(ConnectionCheckReceiver.CONNECTION_CHECK_ACTION);
+                    Intent checkIntent = new Intent(ConnCheckAlarmManger.CONNECTION_CHECK_ACTION);
                     context.sendBroadcast(checkIntent);
                 }
             } else {

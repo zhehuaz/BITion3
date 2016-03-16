@@ -6,11 +6,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import me.zhehua.bition3.R;
+import me.zhehua.bition3.connection.ConnCheckAlarmManger;
 
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
