@@ -39,7 +39,7 @@ public class ConnectionCheckReceiver extends BroadcastReceiver {
                 Log.i(TAG, "Check connect response.");
                 String responseContent = response.body().string();
                 response.body().close();
-                Log.i(TAG, "Response: " + responseContent);
+                Log.i(TAG, response.isRedirect() + " Response: " + responseContent);
                 if (responseContent.length() > 200 /* && !responseContent.matches("^\\{\"status\"") */) {
                     // in the Intranet
                     SharedPreferences sharedPreferences = context.getSharedPreferences(PreferenceHelper.PREFERENCE_NAME, Context.MODE_PRIVATE);

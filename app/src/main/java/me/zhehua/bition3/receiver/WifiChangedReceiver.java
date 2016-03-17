@@ -10,6 +10,7 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
+import org.xml.sax.helpers.LocatorImpl;
 
 import me.zhehua.bition3.config.PreferenceHelper;
 import me.zhehua.bition3.connection.ConnCheckAlarmManger;
@@ -22,16 +23,17 @@ public class WifiChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.i(TAG, "onReceive()");
         sharedPreferences = context.getSharedPreferences(PreferenceHelper.PREFERENCE_NAME, Context.MODE_PRIVATE);
-        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
         if (networkInfo == null) {
             Log.i(TAG, "network info is null");
             EventBus.getDefault().post(new WifiStateChangeEvent());
-        } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+        } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
+                && networkInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED) {
             NetworkInfo.State state = networkInfo.getState();
-            Log.i(TAG, "state is " + state.toString());
+            Log.i(TAG, networkInfo.getTypeName() + " state is " + state.toString());
             EventBus.getDefault().post(new WifiStateChangeEvent());
 
             if (PreferenceHelper.isAutoLogin(sharedPreferences)) {

@@ -9,9 +9,6 @@ import android.os.SystemClock;
 
 import me.zhehua.bition3.config.PreferenceHelper;
 
-/**
- * Created by zhehuaz on 3/15/16.
- */
 public class ConnCheckAlarmManger {
     public final static String CONNECTION_CHECK_ACTION = "me.zhehua.bition3.action.CONNECTION_CHECK";
 
