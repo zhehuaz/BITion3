@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -23,10 +25,13 @@ public class ConnectionCheckReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
+        Log.i(TAG, "Check broadcast received.");
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
+        final Request request = new Request.Builder()
                 .url(tryUrl)
                 .get().build();
+        final SharedPreferences sharedPreferences
+                = context.getSharedPreferences(PreferenceHelper.PREFERENCE_NAME, Context.MODE_PRIVATE);
 
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -39,17 +44,37 @@ public class ConnectionCheckReceiver extends BroadcastReceiver {
                 Log.i(TAG, "Check connect response.");
                 String responseContent = response.body().string();
                 response.body().close();
-                Log.i(TAG, response.isRedirect() + " Response: " + responseContent);
-                if (responseContent.length() > 200 /* && !responseContent.matches("^\\{\"status\"") */) {
-                    // in the Intranet
-                    SharedPreferences sharedPreferences = context.getSharedPreferences(PreferenceHelper.PREFERENCE_NAME, Context.MODE_PRIVATE);
+                Log.i(TAG, "Response: " + responseContent);
+                if (!responseContent.matches("\\{\"status\".*")) {
+                    /* not signed in */
                     String username = PreferenceHelper.getUsername(sharedPreferences);
                     String password = PreferenceHelper.getPassword(sharedPreferences);
-                    LoginHelper.asyncLogin(username, password);
+                    LoginHelper.asyncLogin(username, password, new LoginHelper.LoginCallBack() {
+                        @Override
+                        public void onSuccess() {
+                            ConnCheckAlarmManger.startListening(context);
+                        }
+
+                        @Override
+                        public void onFail(@Nullable String response) {
+                            if (response != null) {
+                                switch (response) {
+                                    case LoginHelper.RESPONSE_ONLINE_NUM_ERROR:
+                                        if (PreferenceHelper.isAutoLogout(sharedPreferences)) {
+                                            LoginHelper.asyncLogout();
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            } else {
+                                ConnCheckAlarmManger.stopListening(context);
+                            }
+                        }
+                    });
                 }
             }
         });
-
-
     }
+
 }

@@ -1,9 +1,13 @@
 package me.zhehua.bition3.connection;
 
+import android.util.Log;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 
-import de.greenrobot.event.EventBus;
 import me.zhehua.bition3.events.LoginFailureEvent;
+import me.zhehua.bition3.events.LoginSuccessEvent;
 import me.zhehua.bition3.utils.MD5;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -14,6 +18,8 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginHelper {
+
+    public final static String TAG = "LoginHelper";
 
     public final static String RESPONSE_USER_TAB_ERROR = "user_tab_error";
     public final static String RESPONSE_USERNAME_ERROR = "username_error";
@@ -39,10 +45,11 @@ public class LoginHelper {
     public final static String RESPONSE_LOGOUT_OK = "logout_ok";
     public final static String RESPONSE_LOGOUT_ERROR = "logout_error";
 
-    public static void asyncLogin(String username, String psw) {
+    public static void asyncLogin(String username, String psw, final LoginCallBack callBack) {
+        Log.i(TAG, "start to login.");
         if (username == null || psw == null)
             return ;
-        String url = "http://10.0.0.55/cgi-bin/srun_portal";
+        String url = "http://10.0.0.55/cgi-bin/do_login";
         OkHttpClient client = new OkHttpClient();
 
         RequestBody requestBody = new FormBody.Builder()
@@ -59,23 +66,36 @@ public class LoginHelper {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                // TODO not in intranet environment
                 EventBus.getDefault().post(new LoginFailureEvent());
+                if (callBack != null)
+                    callBack.onFail(null);
+                Log.e(TAG, "login error");
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseContent = response.body().string();
                 response.body().close();
-                switch (responseContent) {
-                    case RESPONSE_LOGIN_OK :
-                        // TODO login successfully
-                        break;
-                    case RESPONSE_ONLINE_NUM_ERROR:
-                        // TODO online number exceeded
-                        break;
+                Log.i(TAG, "get response : " + responseContent);
+                if (responseContent.equals(RESPONSE_LOGIN_OK)) {
+                    EventBus.getDefault().post(new LoginSuccessEvent());
+                    if (callBack != null)
+                        callBack.onSuccess();
+                } else {
+                    EventBus.getDefault().post(new LoginFailureEvent());
+                    if (callBack != null)
+                        callBack.onFail(responseContent);
                 }
             }
         });
+    }
+
+    public static void asyncLogout() {
+
+    }
+
+    public interface LoginCallBack {
+        void onSuccess();
+        void onFail(String response);
     }
 }

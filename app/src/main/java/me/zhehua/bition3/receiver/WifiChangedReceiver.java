@@ -42,6 +42,7 @@ public class WifiChangedReceiver extends BroadcastReceiver {
                 if (PreferenceHelper.isAutoSsid(sharedPreferences, currentSsid)) {
                     Intent checkIntent = new Intent(ConnCheckAlarmManger.CONNECTION_CHECK_ACTION);
                     context.sendBroadcast(checkIntent);
+                    Log.i(TAG, "Check broadcast sent.");
                 }
             } else {
 
