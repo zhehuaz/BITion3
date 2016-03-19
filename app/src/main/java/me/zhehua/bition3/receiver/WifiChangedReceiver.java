@@ -30,6 +30,7 @@ public class WifiChangedReceiver extends BroadcastReceiver {
         if (networkInfo == null) {
             Log.i(TAG, "network info is null");
             EventBus.getDefault().post(new WifiStateChangeEvent());
+            ConnCheckAlarmManger.stopListening(context);
         } else if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI
                 && networkInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED) {
             NetworkInfo.State state = networkInfo.getState();

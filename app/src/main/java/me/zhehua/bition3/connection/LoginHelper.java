@@ -1,5 +1,6 @@
 package me.zhehua.bition3.connection;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -16,6 +17,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.schedulers.Schedulers;
 
 public class LoginHelper {
 
@@ -45,57 +49,48 @@ public class LoginHelper {
     public final static String RESPONSE_LOGOUT_OK = "logout_ok";
     public final static String RESPONSE_LOGOUT_ERROR = "logout_error";
 
-    public static void asyncLogin(String username, String psw, final LoginCallBack callBack) {
+    public static Observable<String> asyncLogin(@NonNull final String username, @NonNull final String psw) {
         Log.i(TAG, "start to login.");
-        if (username == null || psw == null)
-            return ;
-        String url = "http://10.0.0.55/cgi-bin/do_login";
-        OkHttpClient client = new OkHttpClient();
+        final String url = "http://10.0.0.55/cgi-bin/do_login";
+        final OkHttpClient client = new OkHttpClient();
 
-        RequestBody requestBody = new FormBody.Builder()
-                .add("username", username)
-                .add("password", MD5.getMD516(psw).toLowerCase())
-                .add("drop", "0")
-                .add("type", "1")
-                .add("n", "100")
-                .build();
-        Request request = new Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                EventBus.getDefault().post(new LoginFailureEvent());
-                if (callBack != null)
-                    callBack.onFail(null);
-                Log.e(TAG, "login error");
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseContent = response.body().string();
-                response.body().close();
-                Log.i(TAG, "get response : " + responseContent);
-                if (responseContent.equals(RESPONSE_LOGIN_OK)) {
-                    EventBus.getDefault().post(new LoginSuccessEvent());
-                    if (callBack != null)
-                        callBack.onSuccess();
-                } else {
+            public void call(Subscriber<? super String> subscriber) {
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("username", username)
+                        .add("password", MD5.getMD516(psw).toLowerCase())
+                        .add("drop", "0")
+                        .add("type", "1")
+                        .add("n", "100")
+                        .build();
+                Request request = new Request.Builder()
+                        .url(url)
+                        .post(requestBody)
+                        .build();
+                try {
+                    Response response = client.newCall(request).execute();
+                    String responseContent = response.body().string();
+                    response.body().close();
+                    Log.i(TAG, "get response : " + responseContent);
+                    subscriber.onNext(responseContent);
+                    if (responseContent.equals(RESPONSE_LOGIN_OK)) {
+                        EventBus.getDefault().post(new LoginSuccessEvent());
+                    } else {
+                        EventBus.getDefault().post(new LoginFailureEvent());
+                    }
+                } catch (IOException e) {
+                    subscriber.onError(e);
                     EventBus.getDefault().post(new LoginFailureEvent());
-                    if (callBack != null)
-                        callBack.onFail(responseContent);
+                    Log.e(TAG, "login error");
                 }
             }
-        });
-    }
-
-    public static void asyncLogout() {
+        }).subscribeOn(Schedulers.io());
 
     }
 
-    public interface LoginCallBack {
-        void onSuccess();
-        void onFail(String response);
+    public static Observable<String> asyncLogout() {
+        Log.i(TAG, "try logout");
+        return Observable.just(LoginHelper.RESPONSE_LOGOUT_OK);
     }
 }

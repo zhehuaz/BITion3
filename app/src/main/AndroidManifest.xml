@@ -35,7 +35,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".receiver.ConnectionCheckReceiver">
+        <receiver android:name=".receiver.ConnCheckReceiver">
             <intent-filter>
                 <action android:name="me.zhehua.bition3.action.CONNECTION_CHECK"/>
             </intent-filter>

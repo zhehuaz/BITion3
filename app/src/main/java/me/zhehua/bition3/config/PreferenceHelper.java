@@ -54,7 +54,7 @@ public class PreferenceHelper {
     }
 
     public static boolean isAutoLogout(@NonNull SharedPreferences sp) {
-        return sp.getBoolean(KEY_IS_AUTO_LOGOUT, false);
+        return sp.getBoolean(KEY_IS_AUTO_LOGOUT, true);
     }
 
     public static void saveIsSilent(@NonNull SharedPreferences sp, boolean isSilent) {

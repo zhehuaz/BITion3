@@ -1,14 +1,14 @@
 package me.zhehua.bition3.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.support.v7.app.AppCompatActivity;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import me.zhehua.bition3.R;
-import me.zhehua.bition3.connection.ConnCheckAlarmManger;
+import me.zhehua.bition3.events.LoginFailureEvent;
+import me.zhehua.bition3.events.LoginSuccessEvent;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -32,5 +32,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onLoginSuccess(LoginSuccessEvent event) {
+
+    }
+
+    @Subscribe
+    public void onLoginFailure(LoginFailureEvent event) {
+
     }
 }
